@@ -13,13 +13,13 @@ namespace AntiBayanBot.Core.Models
         public bool IsBayan { get; set; }
 
         /// <summary>
-        /// User ID, who sent this image before. Null if is not bayan.
+        /// The measurment of image bayanity from 0 to 1 (percantage). 1 - full bayan.
         /// </summary>
-        public int? SentByUserId { get; set; }
+        public float Bayanity { get; set; }
 
         /// <summary>
-        /// Date and time of sending the similar image. Null if is not bayan.
+        /// NULL if image is original. Otherwise - point to original image from the DB.
         /// </summary>
-        public DateTime? SendAtDateTime { get; set; }
+        public ImageData OriginalImage { get; set; }
     }
 }

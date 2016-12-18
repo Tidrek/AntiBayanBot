@@ -1,8 +1,10 @@
+DROP TABLE IF EXISTS dbo.ImageData
+
 CREATE TABLE dbo.ImageData(
 	Id int IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	ChatId int,
 	UserId int,
-	Features nvarchar(max),
+	Descriptors varbinary(max),
 	DateTimeAdded datetime2(0)
 )
 

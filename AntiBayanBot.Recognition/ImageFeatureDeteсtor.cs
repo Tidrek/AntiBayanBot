@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using AntiBayanBot.Core;
 using Emgu.CV;
 using Emgu.CV.Features2D;
 using Emgu.CV.Flann;
@@ -10,19 +11,19 @@ namespace AntiBayanBot.Recognition
     public class ImageFeatureDeteсtor
     {
         private readonly SURFDetector _surfDetector = new SURFDetector(300, false);
-        private const int Size = 300;
+        private readonly int _size = Settings.Get<int>("size");
 
 
         public float[,] GetDescriptors(Image image)
         {
-            using (var grayImage = new Image<Gray, byte>(new Bitmap(image, Size, Size)))
+            using (var grayImage = new Image<Gray, byte>(new Bitmap(image, _size, _size)))
             {
                 var modelKeyPoints = _surfDetector.DetectKeyPointsRaw(grayImage, null);
                 return _surfDetector.ComputeDescriptorsRaw(grayImage, null, modelKeyPoints).Data;
             }
         }
 
-
+        
         public float GetSimilarity(float[,] firstImageDescriptorsData, float[,] secondimageDescriptorsData)
         {
             var similarity1 = CalculateSimilarity(firstImageDescriptorsData, secondimageDescriptorsData);

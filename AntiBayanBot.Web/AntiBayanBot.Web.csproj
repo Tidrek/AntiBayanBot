@@ -137,6 +137,10 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AntiBayanBot.Core\AntiBayanBot.Core.csproj">
+      <Project>{88BA7A3A-1773-4D89-A5D1-2042A7A7769C}</Project>
+      <Name>AntiBayanBot.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AntiBayanBot.Recognition\AntiBayanBot.Recognition.csproj">
       <Project>{b735c8a1-6b9d-4663-a6ef-dc16f366b035}</Project>
       <Name>AntiBayanBot.Recognition</Name>
