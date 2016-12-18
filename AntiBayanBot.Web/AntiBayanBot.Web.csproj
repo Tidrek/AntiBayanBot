@@ -31,6 +31,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -91,6 +92,7 @@
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -99,6 +101,7 @@
   <ItemGroup>
     <Content Include="Views\web.config" />
     <Content Include="packages.config" />
+    <Content Include="Views\Test\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -109,9 +112,12 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
-    <Folder Include="Views\Home\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AntiBayanBot.Recognition\AntiBayanBot.Recognition.csproj">
+      <Project>{b735c8a1-6b9d-4663-a6ef-dc16f366b035}</Project>
+      <Name>AntiBayanBot.Recognition</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AntiBayanBot.Telegram\AntiBayanBot.Telegram.csproj">
       <Project>{25330c71-0aac-4de3-b87f-6635d8b6b3c3}</Project>
       <Name>AntiBayanBot.Telegram</Name>
