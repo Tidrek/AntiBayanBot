@@ -116,7 +116,6 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AntiBayanBotController.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -136,16 +135,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntiBayanBot.Recognition\AntiBayanBot.Recognition.csproj">
       <Project>{b735c8a1-6b9d-4663-a6ef-dc16f366b035}</Project>
       <Name>AntiBayanBot.Recognition</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AntiBayanBot.Telegram\AntiBayanBot.Telegram.csproj">
-      <Project>{25330c71-0aac-4de3-b87f-6635d8b6b3c3}</Project>
-      <Name>AntiBayanBot.Telegram</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

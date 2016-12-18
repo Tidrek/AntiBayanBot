@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BayanDetector.cs" />
     <Compile Include="ImageFeatureDeteсtor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -127,6 +128,12 @@
     <Content Include="opencv_videostab2410.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AntiBayanBot.Core\AntiBayanBot.Core.csproj">
+      <Project>{88BA7A3A-1773-4D89-A5D1-2042A7A7769C}</Project>
+      <Name>AntiBayanBot.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

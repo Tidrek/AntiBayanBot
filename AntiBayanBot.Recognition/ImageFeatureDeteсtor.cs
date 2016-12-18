@@ -10,19 +10,20 @@ namespace AntiBayanBot.Recognition
     public class ImageFeatureDeteсtor
     {
         private readonly SURFDetector _surfDetector = new SURFDetector(300, false);
+        private const int Size = 300;
 
 
-        public float[,] GetDescriptors(Bitmap bitmap)
+        public float[,] GetDescriptors(Image image)
         {
-            using (var image = new Image<Gray, byte>(bitmap))
+            using (var grayImage = new Image<Gray, byte>(new Bitmap(image, Size, Size)))
             {
-                var modelKeyPoints = _surfDetector.DetectKeyPointsRaw(image, null);
-                return _surfDetector.ComputeDescriptorsRaw(image, null, modelKeyPoints).Data;
+                var modelKeyPoints = _surfDetector.DetectKeyPointsRaw(grayImage, null);
+                return _surfDetector.ComputeDescriptorsRaw(grayImage, null, modelKeyPoints).Data;
             }
         }
 
 
-        public float IsSimilar(float[,] firstImageDescriptorsData, float[,] secondimageDescriptorsData)
+        public float GetSimilarity(float[,] firstImageDescriptorsData, float[,] secondimageDescriptorsData)
         {
             var similarity1 = CalculateSimilarity(firstImageDescriptorsData, secondimageDescriptorsData);
             var similarity2 = CalculateSimilarity(secondimageDescriptorsData, firstImageDescriptorsData);

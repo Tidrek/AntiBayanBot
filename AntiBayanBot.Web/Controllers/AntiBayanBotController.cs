@@ -12,18 +12,18 @@ namespace AntiBayanBot.Web.Controllers
 {
     public class AntiBayanBotController : ApiController
     {
-        private readonly TelegramBotClient Bot = new TelegramBotClient(ConfigurationManager.AppSettings["AntiBayanBotToken"]);
+        private readonly TelegramBotClient _bot = new TelegramBotClient(ConfigurationManager.AppSettings["AntiBayanBotToken"]);
 
         public async Task<IHttpActionResult> Post(Update update)
         {
             var message = update.Message;
-            bool bayanDetected = false;
+            var bayanDetected = false;
 
             if (message.Type == MessageType.PhotoMessage)
             {
                 // Download Photo
-                var file = await Bot.GetFileAsync(message.Photo.LastOrDefault()?.FileId);
-                string imageExt = file.FilePath.Split('.').Last();
+                var file = await _bot.GetFileAsync(message.Photo.LastOrDefault()?.FileId);
+                var imageExt = file.FilePath.Split('.').Last();
 
                 bayanDetected = new BayanDetector().DetectPhotoBayan(file.FileStream, file.FileSize, imageExt);
                 
@@ -43,7 +43,7 @@ namespace AntiBayanBot.Web.Controllers
 
             if (bayanDetected)
             {
-                await Bot.SendTextMessageAsync(message.Chat.Id, text: GetPunishMessage(), replyToMessageId: message.MessageId);
+                await _bot.SendTextMessageAsync(message.Chat.Id, text: GetPunishMessage(), replyToMessageId: message.MessageId);
             }            
 
             return Ok();

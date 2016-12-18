@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Globalization;
 using System.Web;
 using System.Web.Mvc;
 using AntiBayanBot.Recognition;
@@ -18,14 +19,13 @@ namespace AntiBayanBot.Web.Controllers
         {
             var detector = new ImageFeatureDeteсtor();
 
-            var x = Request.Files;
-            var bmp1 = new Bitmap((Bitmap)Image.FromStream(image1.InputStream, true, true), 200, 200);
-            var bmp2 = new Bitmap((Bitmap)Image.FromStream(image2.InputStream, true, true), 200, 200);
+            var bmp1 = (Bitmap)Image.FromStream(image1.InputStream);
+            var bmp2 = (Bitmap)Image.FromStream(image2.InputStream);
 
             var d1 = detector.GetDescriptors(bmp1);
             var d2 = detector.GetDescriptors(bmp2);
 
-            return Content(detector.IsSimilar(d1, d2).ToString());
+            return Content(detector.GetSimilarity(d1, d2).ToString(CultureInfo.InvariantCulture));
         }
 
     }
