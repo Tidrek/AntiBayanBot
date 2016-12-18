@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -22,11 +21,12 @@ namespace AntiBayanBot.Core.Dal
 
             using (var connection = new SqlConnection(ConnectionString))
             {
-                var command = new SqlCommand("SELECT ChatId, UserId, Descriptors, DateTimeAdded FROM dbo.ImageData", connection);
+                var command = new SqlCommand("SELECT ChatId, UserId, Descriptors, DateTimeAdded FROM dbo.ImageData WHERE ChatId = @ChatId ORDER BY Id DESC", connection);
+
+                command.Parameters.Add("@ChatId", SqlDbType.Int).Value = chatId;
+
                 connection.Open();
-
                 var reader = command.ExecuteReader();
-
                 while (reader.HasRows)
                 {
                     while (reader.Read())
