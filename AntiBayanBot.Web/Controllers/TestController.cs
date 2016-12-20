@@ -28,8 +28,16 @@ namespace AntiBayanBot.Web.Controllers
             //return Content(detector.GetSimilarity(d1, d2).ToString(CultureInfo.InvariantCulture));
 
             var image = Image.FromStream(image1.InputStream);
-
-            var result = Recognition.BayanDetector.DetectPhotoBayan(image, 0, 0, DateTime.Now);
+            var messageData = new Core.Models.MessageData
+            {
+                MessageId = 0,
+                ChatId = 0,
+                UserId = 0,
+                DateTimeAdded = DateTime.UtcNow,                
+                UserFullName = "foo bar",
+                UserName = "foobar"
+            };
+            var result = Recognition.BayanDetector.DetectPhotoBayan(image, messageData);
 
             return Content(result.IsBayan ? $"BAYAN. Bayanity is: {result.Bayanity}" : "OK");
         }

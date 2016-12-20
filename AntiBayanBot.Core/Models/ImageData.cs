@@ -1,12 +1,9 @@
 ﻿using System;
 namespace AntiBayanBot.Core.Models
 {
-    public class ImageData
+    public class ImageData : MessageData
     {
-        public int ChatId { get; set; }
-        public int UserId { get; set; }
         public byte[] Descriptors { get; set; }
-        public DateTime DateTimeAdded { get; set; }
 
         public void SetDescriptors(float[,] data)
         {
@@ -54,11 +51,8 @@ namespace AntiBayanBot.Core.Models
 
         public ImageData() { }
 
-        public ImageData(int chatId, int userId, DateTime dateTimeAdded, float[,] descriptors)
+        public ImageData(float[,] descriptors)
         {
-            ChatId = chatId;
-            UserId = userId;
-            DateTimeAdded = dateTimeAdded;
             SetDescriptors(descriptors);
         }
     }

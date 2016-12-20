@@ -15,15 +15,15 @@ namespace AntiBayanBot.Core.Dal
         /// Get all image data for selected chat from the DB.
         /// </summary>
         /// <returns>Image data list.</returns>
-        public List<ImageData> GetForChat(int chatId)
+        public List<ImageData> GetForChat(long chatId)
         {
             var result = new List<ImageData>();
 
             using (var connection = new SqlConnection(ConnectionString))
             {
-                var command = new SqlCommand("SELECT ChatId, UserId, Descriptors, DateTimeAdded FROM dbo.ImageData WHERE ChatId = @ChatId ORDER BY Id DESC", connection);
+                var command = new SqlCommand("SELECT MessageId, ChatId, UserId, Descriptors, DateTimeAdded, UserFullName, UserName FROM dbo.ImageData WHERE ChatId = @ChatId ORDER BY Id DESC", connection);
 
-                command.Parameters.Add("@ChatId", SqlDbType.Int).Value = chatId;
+                command.Parameters.Add("@ChatId", SqlDbType.BigInt).Value = chatId;
 
                 connection.Open();
                 var reader = command.ExecuteReader();
@@ -33,10 +33,13 @@ namespace AntiBayanBot.Core.Dal
                     {
                         result.Add(new ImageData
                         {
-                            ChatId = reader.GetInt32(0),
-                            UserId = reader.GetInt32(1),
-                            Descriptors = (byte[])reader.GetValue(2),
-                            DateTimeAdded = reader.GetDateTime(3)
+                            MessageId = reader.GetInt32(0),
+                            ChatId = reader.GetInt64(1),
+                            UserId = reader.GetInt64(2),
+                            Descriptors = (byte[])reader.GetValue(3),
+                            DateTimeAdded = reader.GetDateTime(4),
+                            UserFullName = reader.GetString(5),
+                            UserName = reader.GetString(6)
                         });
                     }
 
@@ -55,15 +58,19 @@ namespace AntiBayanBot.Core.Dal
         public void Insert(ImageData imageData)
         {
             const string query =
-                "INSERT INTO dbo.ImageData (ChatId, UserId, Descriptors, DateTimeAdded) VALUES (@ChatId, @UserId, @Descriptors, @DateTimeAdded)";
+                "INSERT INTO dbo.ImageData (MessageId, ChatId, UserId, Descriptors, DateTimeAdded, UserFullName, UserName) " +
+                "VALUES (@MessageId, @ChatId, @UserId, @Descriptors, @DateTimeAdded, @UserFullName, @UserName)";
 
             using (var connection = new SqlConnection(ConnectionString))
             using (var command = new SqlCommand(query, connection))
             {
-                command.Parameters.Add("@ChatId", SqlDbType.Int).Value = imageData.ChatId;
-                command.Parameters.Add("@UserId", SqlDbType.Int).Value = imageData.UserId;
+                command.Parameters.Add("@MessageId", SqlDbType.Int).Value = imageData.MessageId;
+                command.Parameters.Add("@ChatId", SqlDbType.BigInt).Value = imageData.ChatId;
+                command.Parameters.Add("@UserId", SqlDbType.BigInt).Value = imageData.UserId;
                 command.Parameters.Add("@Descriptors", SqlDbType.VarBinary).Value = imageData.Descriptors;
                 command.Parameters.Add("@DateTimeAdded", SqlDbType.DateTime2).Value = imageData.DateTimeAdded;
+                command.Parameters.Add("@UserFullName", SqlDbType.NVarChar, 255).Value = imageData.UserFullName;
+                command.Parameters.Add("@UserName", SqlDbType.NVarChar, 32).Value = imageData.UserName;
 
                 connection.Open();
                 command.ExecuteNonQuery();

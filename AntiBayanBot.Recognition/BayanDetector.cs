@@ -20,14 +20,14 @@ namespace AntiBayanBot.Recognition
         /// <param name="userId">User ID as integer.</param>
         /// <param name="datetimeAdded">Date and time of the message with image.</param>
         /// <returns>BayanResult object.</returns>
-        public static BayanResult DetectPhotoBayan(Image image, int chatId, int userId, DateTime datetimeAdded)
+        public static BayanResult DetectPhotoBayan(Image image, MessageData messageData)
         {
             var detector = new ImageFeatureDeteсtor();
             var repository = new ImageDataRepository();
             var similarityLimit = Settings.Get<float>("similarity");
 
             var descriptors = detector.GetDescriptors(image);
-            var imagesData = repository.GetForChat(chatId);
+            var imagesData = repository.GetForChat(messageData.ChatId);
 
             var tasks = new List<Task<BayanResult>>(imagesData.Count);
             var cancellationTokenSource = new CancellationTokenSource();
@@ -67,7 +67,15 @@ namespace AntiBayanBot.Recognition
             }
 
             // If is not bayan, save the image data
-            var newImageData = new ImageData(chatId, userId, datetimeAdded, descriptors);
+            var newImageData = new ImageData(descriptors: descriptors)
+            {
+                ChatId = messageData.ChatId,
+                UserId = messageData.UserId,
+                DateTimeAdded = messageData.DateTimeAdded,                
+                MessageId = messageData.MessageId,
+                UserFullName = messageData.UserFullName,
+                UserName = messageData.UserName
+            };
             repository.Insert(newImageData);
 
             return totalResult;

@@ -45,6 +45,7 @@
     <Compile Include="Dal\ImageDataRepository.cs" />
     <Compile Include="Models\BayanResult.cs" />
     <Compile Include="Models\ImageData.cs" />
+    <Compile Include="Models\MessageData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
   </ItemGroup>
