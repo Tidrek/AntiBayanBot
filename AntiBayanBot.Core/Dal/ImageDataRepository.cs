@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -58,7 +57,7 @@ namespace AntiBayanBot.Core.Dal
         /// <param name="imageData">Image data.</param>
         public void Insert(ImageData imageData)
         {
-            string query = string.IsNullOrEmpty(imageData.UserName) ?
+            var query = string.IsNullOrEmpty(imageData.UserName) ?
                 "INSERT INTO dbo.ImageData (MessageId, ChatId, UserId, Descriptors, DateTimeAdded, UserFullName) " +
                 "VALUES (@MessageId, @ChatId, @UserId, @Descriptors, @DateTimeAdded, @UserFullName)" :
                 "INSERT INTO dbo.ImageData (MessageId, ChatId, UserId, Descriptors, DateTimeAdded, UserFullName, UserName) " +

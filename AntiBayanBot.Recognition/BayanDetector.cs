@@ -1,12 +1,11 @@
-﻿using AntiBayanBot.Core.Models;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AntiBayanBot.Core;
 using AntiBayanBot.Core.Dal;
+using AntiBayanBot.Core.Models;
 
 namespace AntiBayanBot.Recognition
 {
@@ -16,9 +15,7 @@ namespace AntiBayanBot.Recognition
         /// Photo bayan detector method which uses OpenCV. NB: it saves image data to the DB, which is passed to it, if the image is not bayan.
         /// </summary>
         /// <param name="image">Image to check.</param>
-        /// <param name="chatId">Chat ID as integer.</param>
-        /// <param name="userId">User ID as integer.</param>
-        /// <param name="datetimeAdded">Date and time of the message with image.</param>
+        /// <param name="messageData">Message data.</param>
         /// <returns>BayanResult object.</returns>
         public static BayanResult DetectPhotoBayan(Image image, MessageData messageData)
         {
@@ -60,6 +57,14 @@ namespace AntiBayanBot.Recognition
                     // Cancell all tasks
                     cancellationTokenSource.Cancel();
                     totalResult = taskResult;
+
+                    // Наказываем баяниста
+                    var statisticsRepository = new StatisticsRepository();
+
+                    // Сколько он уже набаянил
+                    var bayans = statisticsRepository.IncrementBayansCount(messageData.ChatId, messageData.UserId);
+                    taskResult.BayansCount = bayans;
+
                     return totalResult;
                 }
 
@@ -67,7 +72,7 @@ namespace AntiBayanBot.Recognition
             }
 
             // If is not bayan, save the image data
-            var newImageData = new ImageData(descriptors: descriptors)
+            var newImageData = new ImageData(descriptors)
             {
                 ChatId = messageData.ChatId,
                 UserId = messageData.UserId,

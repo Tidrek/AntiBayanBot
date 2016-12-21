@@ -34,7 +34,7 @@ namespace AntiBayanBot.Web.Controllers
                         ChatId = message.Chat.Id,
                         UserId = message.From.Id,
                         DateTimeAdded = DateTime.UtcNow,
-                        UserFullName = message.From.FirstName + " " + message.From.LastName,
+                        UserFullName = string.IsNullOrWhiteSpace(message.From.LastName) ? message.From.FirstName : message.From.FirstName + " " + message.From.LastName,
                         UserName = message.From.Username
                     };
                     result = Recognition.BayanDetector.DetectPhotoBayan(bitmap, messageData);

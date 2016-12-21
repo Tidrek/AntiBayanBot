@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dal\StatisticsRepository.cs" />
     <Compile Include="Dal\ImageDataRepository.cs" />
     <Compile Include="Models\BayanResult.cs" />
     <Compile Include="Models\ImageData.cs" />
@@ -52,6 +53,7 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="Sql\ImageDataTable.sql" />
+    <Content Include="Sql\Statistics.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

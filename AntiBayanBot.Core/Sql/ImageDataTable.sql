@@ -1,13 +1,13 @@
 -- DROP TABLE IF EXISTS dbo.ImageData
-Drop table dbo.ImageData
+DROP TABLE dbo.ImageData
 
-CREATE TABLE dbo.ImageData(
+CREATE TABLE dbo.ImageData (
 	Id int IDENTITY(1,1) PRIMARY KEY NOT NULL,
-	MessageId int,
-	ChatId bigint,
-	UserId bigint,
-	Descriptors varbinary(max),
-	DateTimeAdded datetime2(0),
+	MessageId int NOT NULL,
+	ChatId bigint NOT NULL,
+	UserId bigint NOT NULL,
+	Descriptors varbinary(max) NOT NULL,
+	DateTimeAdded datetime2(0) NOT NULL,
 	UserFullName nvarchar(511),
 	UserName nvarchar(32)
 )
