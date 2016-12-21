@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -39,7 +40,7 @@ namespace AntiBayanBot.Core.Dal
                             Descriptors = (byte[])reader.GetValue(3),
                             DateTimeAdded = reader.GetDateTime(4),
                             UserFullName = reader.GetString(5),
-                            UserName = reader.GetString(6)
+                            UserName = reader.IsDBNull(6) ? null : reader.GetString(6)
                         });
                     }
 
@@ -57,7 +58,9 @@ namespace AntiBayanBot.Core.Dal
         /// <param name="imageData">Image data.</param>
         public void Insert(ImageData imageData)
         {
-            const string query =
+            string query = string.IsNullOrEmpty(imageData.UserName) ?
+                "INSERT INTO dbo.ImageData (MessageId, ChatId, UserId, Descriptors, DateTimeAdded, UserFullName, UserName) " +
+                "VALUES (@MessageId, @ChatId, @UserId, @Descriptors, @DateTimeAdded, @UserFullName)" :
                 "INSERT INTO dbo.ImageData (MessageId, ChatId, UserId, Descriptors, DateTimeAdded, UserFullName, UserName) " +
                 "VALUES (@MessageId, @ChatId, @UserId, @Descriptors, @DateTimeAdded, @UserFullName, @UserName)";
 
@@ -70,8 +73,10 @@ namespace AntiBayanBot.Core.Dal
                 command.Parameters.Add("@Descriptors", SqlDbType.VarBinary).Value = imageData.Descriptors;
                 command.Parameters.Add("@DateTimeAdded", SqlDbType.DateTime2).Value = imageData.DateTimeAdded;
                 command.Parameters.Add("@UserFullName", SqlDbType.NVarChar, 255).Value = imageData.UserFullName;
-                command.Parameters.Add("@UserName", SqlDbType.NVarChar, 32).Value = imageData.UserName;
-
+                if (string.IsNullOrEmpty(imageData.UserName))
+                {
+                    command.Parameters.Add("@UserName", SqlDbType.NVarChar, 32).Value = imageData.UserName;
+                }
                 connection.Open();
                 command.ExecuteNonQuery();
                 connection.Close();
