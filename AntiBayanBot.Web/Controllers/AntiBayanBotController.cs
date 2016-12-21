@@ -72,8 +72,7 @@ namespace AntiBayanBot.Web.Controllers
             }
             catch (Exception ex)
             {   //LOG NAHUY
-                await _bot.SendTextMessageAsync(message.Chat.Id, text: "```" + ex.Message + "```", parseMode:ParseMode.Markdown );
-                await _bot.SendTextMessageAsync(message.Chat.Id, text: "```" + ex.StackTrace + "```", parseMode: ParseMode.Markdown);
+                await _bot.SendTextMessageAsync(message.Chat.Id, text: "```" + ex.Message + "\n\n\n" + ex.StackTrace +"```", parseMode:ParseMode.Markdown );
             }
             return Ok();
         }
@@ -99,8 +98,8 @@ namespace AntiBayanBot.Web.Controllers
         [NonAction]
         public string GetProofForDeletedMessage(string userName, string userFullName, DateTime dateTimeAdded)
         {
-            var result = string.IsNullOrEmpty(userName)? $"@{userFullName}" : $"@{userName}";
-            result += string.Format(" запостил {0:yyyy-MM-dd} в {0: HH:mm}, но за каким-то хером удалил", dateTimeAdded);
+            var result = (string.IsNullOrEmpty(userName)? $"@{userFullName}" : $"@{userName}").Trim();
+            result += string.Format(" запостил {0:yyyy-MM-dd} в {0:HH:mm} UTC, но за каким-то хером удалил.", dateTimeAdded);
             return result;
         }
     }
