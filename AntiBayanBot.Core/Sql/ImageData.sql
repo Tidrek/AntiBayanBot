@@ -8,7 +8,7 @@ CREATE TABLE dbo.ImageData (
 	UserId bigint NOT NULL,
 	Descriptors varbinary(max) NOT NULL,
 	DateTimeAdded datetime2(0) NOT NULL,
-	UserFullName nvarchar(511),
+	UserFullName nvarchar(511) NOT NULL,
 	UserName nvarchar(32)
 )
 

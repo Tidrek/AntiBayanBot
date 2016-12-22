@@ -62,7 +62,7 @@ namespace AntiBayanBot.Recognition
                     var statisticsRepository = new StatisticsRepository();
 
                     // Сколько он уже набаянил
-                    var bayans = statisticsRepository.IncrementBayansCount(messageData.ChatId, messageData.UserId);
+                    var bayans = statisticsRepository.IncrementBayansCount(messageData);
                     taskResult.BayansCount = bayans;
 
                     return totalResult;
