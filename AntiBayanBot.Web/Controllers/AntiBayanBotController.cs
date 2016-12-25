@@ -8,6 +8,8 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Net;
+using System.Globalization;
 
 namespace AntiBayanBot.Web.Controllers
 {
@@ -19,24 +21,17 @@ namespace AntiBayanBot.Web.Controllers
         {
             var message = update.Message;
             var result = new Core.Models.BayanResult();
+            //For a case when multiple url-images are in a single message. Contains only bayans
+            var bayanResults = new List<Core.Models.BayanResult>();
             try
             {
                 if (message?.Type == MessageType.PhotoMessage)
                 {
                     // Download Photo
                     var file = await _bot.GetFileAsync(message.Photo.LastOrDefault()?.FileId);
-                    var imageExt = file.FilePath.Split('.').Last();                    
+                    //var imageExt = file.FilePath.Split('.').Last();
                     var bitmap = new Bitmap(file.FileStream);
-                    var messageData = new Core.Models.MessageData
-                    {
-                        MessageId = message.MessageId,
-                        ChatId = message.Chat.Id,
-                        UserId = message.From.Id,
-                        DateTimeAdded = DateTime.UtcNow,
-                        UserFullName = GetUserFullName(message.From.FirstName, message.From.LastName),
-                        UserName = message.From.Username
-                    };
-                    result = Recognition.BayanDetector.DetectPhotoBayan(bitmap, messageData);
+                    result = GetBayanResult(bitmap, message);
 
                 }
                 else if (message?.Type == MessageType.TextMessage)
@@ -52,14 +47,32 @@ namespace AntiBayanBot.Web.Controllers
                                 break;
                         }
                     }
+                    //find links to images
+                    if(message.Entities != null) { 
+                        foreach(var msgEntity in message.Entities)
+                        {
+                            if(msgEntity.Type == MessageEntityType.Url)
+                            {
+                                var url = message.Text.Substring(msgEntity.Offset, msgEntity.Length);
+                                if (IsImageUrl(url))
+                                {
+                                    var bitmap = GetImageFromUrl(url);
+                                    result = GetBayanResult(bitmap, message);
+                                    if (result.IsBayan)
+                                    {
+                                        bayanResults.Add(result);
+                                    }
+                                }
+                            }
+                        }
+                    }                    
                 }
-                //Check text messages...?
 
-                if (result.IsBayan)
+                if (result.IsBayan || bayanResults.Count != 0)
                 {
                     try
-                    {                        
-                        await _bot.SendTextMessageAsync(message.Chat.Id, text: GetPunishMessage(), replyToMessageId: message.MessageId);                        
+                    {
+                        await _bot.SendTextMessageAsync(message.Chat.Id, text: GetPunishMessage(), replyToMessageId: message.MessageId);
                     }
                     catch (Telegram.Bot.Exceptions.ApiRequestException ex) //Message was deleted before resolve could happen, hence, no punishment
                     {
@@ -93,6 +106,22 @@ namespace AntiBayanBot.Web.Controllers
                 await _bot.SendTextMessageAsync(message.Chat.Id, text: "```" + ex.Message + "\n\n\n" + ex.StackTrace + "```", parseMode: ParseMode.Markdown);
             }
             return Ok();
+        }
+        
+        [NonAction]
+        public AntiBayanBot.Core.Models.BayanResult GetBayanResult(Bitmap bitmap, Telegram.Bot.Types.Message message)
+        {
+            var messageData = new Core.Models.MessageData
+            {
+                MessageId = message.MessageId,
+                ChatId = message.Chat.Id,
+                UserId = message.From.Id,
+                DateTimeAdded = DateTime.UtcNow,
+                UserFullName = GetUserFullName(message.From.FirstName, message.From.LastName),
+                UserName = message.From.Username
+            };
+
+            return Recognition.BayanDetector.DetectPhotoBayan(bitmap, messageData);
         }
 
         [NonAction]
@@ -155,7 +184,7 @@ namespace AntiBayanBot.Web.Controllers
         }
 
         [NonAction]
-        public string GetUserTargetName(string userName, string userFirstName, string userLastName=null)
+        public string GetUserTargetName(string userName, string userFirstName, string userLastName = null)
         {
             return (string.IsNullOrEmpty(userName) ? GetUserFullName(userFirstName, userLastName) : userName).TrimEnd();
         }
@@ -178,12 +207,35 @@ namespace AntiBayanBot.Web.Controllers
         {
             var result = $"<b>Топ заядлых баянистов в группе {chatName}:</b>\n";
             var stats = new Core.Dal.StatisticsRepository().GetChatStatistics(chatId, 10);
-            foreach(var user in stats)
+            foreach (var user in stats)
             {
                 result += $"{GetUserTargetName(user.UserName, user.UserFullName)} ({user.Bayans})\n";
             }
 
             return result;
         }
+
+        [NonAction]
+        public bool IsImageUrl(string url)
+        {
+            var req = (HttpWebRequest)WebRequest.Create(url);
+            req.Method = "HEAD";
+            using (var resp = req.GetResponse())
+            {
+                return resp.ContentType.ToLower(CultureInfo.InvariantCulture).StartsWith("image/");
+            }
+        }
+
+        [NonAction]
+        public Bitmap GetImageFromUrl(string url)
+        {
+            var req = (HttpWebRequest)WebRequest.Create(url);
+            req.Method = "GET";
+            using (var resp = req.GetResponse())
+            {
+                return new Bitmap(resp.GetResponseStream());
+            }
+        }
     }
 }
+ 
