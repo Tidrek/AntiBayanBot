@@ -21,7 +21,7 @@ namespace AntiBayanBot.Web.Controllers
         {
             var message = update.Message;
             var result = new Core.Models.BayanResult();
-            //For a case when multiple url-images are in a single message. Contains only bayans
+            //For a case when single/multiple url-images w/ or w/o message text are in a single message. Contains only bayans
             var bayanResults = new List<Core.Models.BayanResult>();
             try
             {
@@ -66,6 +66,16 @@ namespace AntiBayanBot.Web.Controllers
                             }
                         }
                     }                    
+                }
+                //if photo is uploaded as a document, without compression
+                else if (message?.Type == MessageType.DocumentMessage)
+                {
+                    if(message.Document.MimeType == "image/png")
+                    {
+                        var file = await _bot.GetFileAsync(message.Document.FileId);
+                        var bitmap = new Bitmap(file.FileStream);
+                        result = GetBayanResult(bitmap, message);
+                    }
                 }
 
                 if (result.IsBayan || bayanResults.Count != 0)
