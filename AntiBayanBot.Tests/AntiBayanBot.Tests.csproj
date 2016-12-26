@@ -40,7 +40,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.Web.Http">
+      <HintPath>..\AntiBayanBot.Web\bin\System.Web.Http.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -57,6 +59,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AntIBayanBotControllerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimilarityTests.cs" />
     <Compile Include="DescriptorsConversionTests.cs" />
@@ -69,6 +72,10 @@
     <ProjectReference Include="..\AntiBayanBot.Recognition\AntiBayanBot.Recognition.csproj">
       <Project>{b735c8a1-6b9d-4663-a6ef-dc16f366b035}</Project>
       <Name>AntiBayanBot.Recognition</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AntiBayanBot.Web\AntiBayanBot.Web.csproj">
+      <Project>{69e584eb-84d0-4422-90a5-7ad22c114ccf}</Project>
+      <Name>AntiBayanBot.Web</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
