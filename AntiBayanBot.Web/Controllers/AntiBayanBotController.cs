@@ -54,14 +54,20 @@ namespace AntiBayanBot.Web.Controllers
                             if(msgEntity.Type == MessageEntityType.Url)
                             {
                                 var url = message.Text.Substring(msgEntity.Offset, msgEntity.Length);
-                                if (IsImageUrl(url))
-                                {
-                                    var bitmap = GetImageFromUrl(url);
-                                    result = GetBayanResult(bitmap, message);
-                                    if (result.IsBayan)
+                                try //a lot may go wrong when accessing urls
+                                { 
+                                    if (IsImageUrl(url))
                                     {
-                                        bayanResults.Add(result);
+                                        var bitmap = GetImageFromUrl(url);
+                                        result = GetBayanResult(bitmap, message);
+                                        if (result.IsBayan)
+                                        {
+                                            bayanResults.Add(result);
+                                        }
                                     }
+                                }catch(Exception)
+                                {
+                                    return Ok();
                                 }
                             }
                         }
@@ -228,6 +234,7 @@ namespace AntiBayanBot.Web.Controllers
         [NonAction]
         public bool IsImageUrl(string url)
         {
+            url = PrependUrl(url);
             var req = (HttpWebRequest)WebRequest.Create(url);
             req.Method = "HEAD";
             using (var resp = req.GetResponse())
@@ -239,12 +246,27 @@ namespace AntiBayanBot.Web.Controllers
         [NonAction]
         public Bitmap GetImageFromUrl(string url)
         {
+            url = PrependUrl(url);
             var req = (HttpWebRequest)WebRequest.Create(url);
             req.Method = "GET";
             using (var resp = req.GetResponse())
             {
                 return new Bitmap(resp.GetResponseStream());
             }
+        }
+
+        /// <summary>
+        /// Prepend url with http if it's missing
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        [NonAction]
+        public string PrependUrl(string url)
+        {
+            if (!url.StartsWith("http://") || !url.StartsWith("https://")){
+                url = "http://" + url;
+            }
+            return url;
         }
     }
 }
