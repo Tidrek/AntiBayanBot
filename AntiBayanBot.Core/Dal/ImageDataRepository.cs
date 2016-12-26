@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -27,21 +28,18 @@ namespace AntiBayanBot.Core.Dal
 
                 connection.Open();
                 var reader = command.ExecuteReader();
-                while (reader.HasRows)
+                while (reader.HasRows && reader.Read())
                 {
-                    while (reader.Read())
+                    result.Add(new ImageData
                     {
-                        result.Add(new ImageData
-                        {
-                            MessageId = reader.GetInt32(0),
-                            ChatId = reader.GetInt64(1),
-                            UserId = reader.GetInt64(2),
-                            Descriptors = (byte[])reader.GetValue(3),
-                            DateTimeAdded = reader.GetDateTime(4),
-                            UserFullName = reader.GetString(5),
-                            UserName = reader.IsDBNull(6) ? null : reader.GetString(6)
-                        });
-                    }
+                        MessageId = reader.GetInt32(0),
+                        ChatId = reader.GetInt64(1),
+                        UserId = reader.GetInt64(2),
+                        Descriptors = (byte[])reader.GetValue(3),
+                        DateTimeAdded = reader.GetDateTime(4),
+                        UserFullName = reader.GetString(5),
+                        UserName = reader.IsDBNull(6) ? null : reader.GetString(6)
+                    });
 
                     reader.NextResult();
                 }
@@ -80,6 +78,27 @@ namespace AntiBayanBot.Core.Dal
                 command.ExecuteNonQuery();
                 connection.Close();
             }
+        }
+
+        public bool IsForwarded(DateTime dateForward, long userIdForward, long chatId)
+        {
+            var result = false;
+            using (var connection = new SqlConnection(ConnectionString))
+            {                
+                var command = new SqlCommand(@"SELECT TOP 1 1 FROM ImageData
+                                            WHERE DateTimeAdded=@dateForward
+                                            AND UserId=@userIdForward
+                                            AND ChatId=@chatId", connection);
+
+                command.Parameters.Add("@dateForward", SqlDbType.DateTime).Value = dateForward;
+                command.Parameters.Add("@userIdForward", SqlDbType.BigInt).Value = userIdForward;
+                command.Parameters.Add("@chatId", SqlDbType.BigInt).Value = chatId;
+                connection.Open();
+                var reader = command.ExecuteReader();
+                result = reader.HasRows;
+            }
+
+            return result;
         }
     }
 }

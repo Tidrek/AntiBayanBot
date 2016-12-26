@@ -27,6 +27,8 @@ namespace AntiBayanBot.Web.Controllers
             {
                 if (message?.Type == MessageType.PhotoMessage)
                 {
+                    //---------------------CHECK FORWARD?
+
                     // Download Photo
                     var file = await _bot.GetFileAsync(message.Photo.LastOrDefault()?.FileId);
                     //var imageExt = file.FilePath.Split('.').Last();
@@ -48,14 +50,17 @@ namespace AntiBayanBot.Web.Controllers
                         }
                     }
                     //find links to images
-                    if(message.Entities != null) { 
-                        foreach(var msgEntity in message.Entities)
+                    if (message.Entities != null)
+                    {
+                        foreach (var msgEntity in message.Entities)
                         {
-                            if(msgEntity.Type == MessageEntityType.Url)
+                            if (msgEntity.Type == MessageEntityType.Url)
                             {
+                                //---------------------CHECK FORWARD?
+
                                 var url = message.Text.Substring(msgEntity.Offset, msgEntity.Length);
                                 try //a lot may go wrong when accessing urls
-                                { 
+                                {
                                     if (IsImageUrl(url))
                                     {
                                         var bitmap = GetImageFromUrl(url);
@@ -65,18 +70,19 @@ namespace AntiBayanBot.Web.Controllers
                                             bayanResults.Add(result);
                                         }
                                     }
-                                }catch(Exception)
+                                }
+                                catch (Exception)
                                 {
                                     return Ok();
                                 }
                             }
                         }
-                    }                    
+                    }
                 }
                 //if photo is uploaded as a document, without compression
                 else if (message?.Type == MessageType.DocumentMessage)
                 {
-                    if(message.Document.MimeType == "image/png")
+                    if (IsImage(message.Document.MimeType))
                     {
                         var file = await _bot.GetFileAsync(message.Document.FileId);
                         var bitmap = new Bitmap(file.FileStream);
@@ -101,7 +107,8 @@ namespace AntiBayanBot.Web.Controllers
                     }
                     catch (Telegram.Bot.Exceptions.ApiRequestException ex) //Message was deleted before resolve could happen
                     {
-                        if (ex.Message == "Bad Request: message not found") {
+                        if (ex.Message == "Bad Request: message not found")
+                        {
 
                             await _bot.SendTextMessageAsync(message.Chat.Id, text: GetProofForDeletedMessage(
                                 GetUserTargetName(message.From),
@@ -112,7 +119,7 @@ namespace AntiBayanBot.Web.Controllers
                     if (!string.IsNullOrEmpty(achievMsg))
                     {
                         await Task.Delay(50);
-                        await _bot.SendTextMessageAsync(message.Chat.Id, text: achievMsg, parseMode: ParseMode.Markdown);
+                        await _bot.SendTextMessageAsync(message.Chat.Id, text: achievMsg, parseMode: ParseMode.Html);
                     }
                 }
 
@@ -123,20 +130,33 @@ namespace AntiBayanBot.Web.Controllers
             }
             return Ok();
         }
-        
+
         [NonAction]
         public AntiBayanBot.Core.Models.BayanResult GetBayanResult(Bitmap bitmap, Telegram.Bot.Types.Message message)
         {
             var messageData = new Core.Models.MessageData
             {
                 MessageId = message.MessageId,
-                ChatId = message.Chat.Id,
-                UserId = message.From.Id,
-                DateTimeAdded = DateTime.UtcNow,
-                UserFullName = GetUserFullName(message.From.FirstName, message.From.LastName),
-                UserName = message.From.Username
+                ChatId = message.Chat.Id
             };
-
+            if(message.ForwardFrom == null)
+            {
+                messageData.UserId = message.From.Id;
+                messageData.UserFullName = GetUserFullName(message.From.FirstName, message.From.LastName);
+                messageData.UserName = message.From.Username;
+                messageData.DateTimeAdded = message.Date;
+            }
+            else
+            {
+                messageData.UserId = message.ForwardFrom.Id;
+                messageData.UserFullName = GetUserFullName(message.ForwardFrom.FirstName, message.ForwardFrom.LastName);
+                messageData.UserName = message.ForwardFrom.Username;
+                messageData.DateTimeAdded = message.ForwardDate.Value;
+            }
+            if (IsInnerForward(message))
+            {
+                return new Core.Models.BayanResult();
+            }
             return Recognition.BayanDetector.DetectPhotoBayan(bitmap, messageData);
         }
 
@@ -180,7 +200,7 @@ namespace AntiBayanBot.Web.Controllers
                 {
                     if (bayanCount == achiev.Key)
                     {
-                        achievMessage = $"*\"{achiev.Value}\"*";
+                        achievMessage = $"<b>\"{achiev.Value}\"</b>";
                         break;
                     }
                 }
@@ -263,11 +283,28 @@ namespace AntiBayanBot.Web.Controllers
         [NonAction]
         public string PrependUrl(string url)
         {
-            if (!url.StartsWith("http://") || !url.StartsWith("https://")){
+            if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+            {
                 url = "http://" + url;
             }
             return url;
         }
+
+        [NonAction]
+        public bool IsInnerForward(Telegram.Bot.Types.Message message)
+        {
+            if (message.ForwardDate == null)
+            {
+                return false;
+            }
+            return new Core.Dal.ImageDataRepository().IsForwarded(message.ForwardDate.Value, message.ForwardFrom.Id, message.Chat.Id);
+        }
+
+        [NonAction]
+        public bool IsImage(string mimetype)
+        {
+            string[] mimetypes = new string[] { "image/png", "image/jpeg", "image/gif", "image/tiff", "image/x-tiff", "image/bmp", "image/x-windows-bmp", "image/x-icon" };
+            return mimetypes.Contains(mimetype);
+        }
     }
 }
- 
