@@ -92,6 +92,8 @@ namespace AntiBayanBot.Web.Controllers
 
                 if (result.IsBayan || bayanResults.Count != 0)
                 {
+
+
                     try
                     {
                         await _bot.SendTextMessageAsync(message.Chat.Id, text: GetPunishMessage(), replyToMessageId: message.MessageId);
@@ -103,7 +105,7 @@ namespace AntiBayanBot.Web.Controllers
                     try
                     {
                         await Task.Delay(50);
-                        await _bot.SendTextMessageAsync(message.Chat.Id, text: "Пруф", replyToMessageId: result.OriginalImage.MessageId);
+                        await _bot.SendTextMessageAsync(message.Chat.Id, text: $"Пруф. Инфа {Math.Round(result.Bayanity * 100)}%", replyToMessageId: result.OriginalImage.MessageId);
                     }
                     catch (Telegram.Bot.Exceptions.ApiRequestException ex) //Message was deleted before resolve could happen
                     {
@@ -134,35 +136,64 @@ namespace AntiBayanBot.Web.Controllers
         [NonAction]
         public AntiBayanBot.Core.Models.BayanResult GetBayanResult(Bitmap bitmap, Telegram.Bot.Types.Message message)
         {
-            var messageData = new Core.Models.MessageData
+            Core.Models.MessageData forwardMsgData = null;
+
+            if (message.ForwardFrom != null)
+            {
+                forwardMsgData = new Core.Models.MessageData()
+                {
+                    MessageId = message.MessageId,
+                    ChatId = message.Chat.Id,
+                    UserId = message.ForwardFrom.Id,
+                    UserFullName = GetUserFullName(message.ForwardFrom.FirstName, message.ForwardFrom.LastName),
+                    UserName = message.ForwardFrom.Username,
+                    DateTimeAdded = message.ForwardDate.Value
+                };
+            }
+            else if (message.ForwardFromChat != null)
+            {
+                forwardMsgData = new Core.Models.MessageData()
+                {
+                    MessageId = message.MessageId,
+                    ChatId = message.Chat.Id,
+                    UserId = message.ForwardFromChat.Id,
+                    UserFullName = message.ForwardFromChat.Title,
+                    UserName = message.ForwardFromChat.Title,
+                    DateTimeAdded = message.ForwardDate.Value
+                };
+            }
+            var msgData = new Core.Models.MessageData()
             {
                 MessageId = message.MessageId,
-                ChatId = message.Chat.Id
+                ChatId = message.Chat.Id,
+                UserId = message.From.Id,
+                UserFullName = GetUserFullName(message.From.FirstName, message.From.LastName),
+                UserName = message.From.Username,
+                DateTimeAdded = message.Date
             };
-            if(message.ForwardFrom == null)
-            {
-                messageData.UserId = message.From.Id;
-                messageData.UserFullName = GetUserFullName(message.From.FirstName, message.From.LastName);
-                messageData.UserName = message.From.Username;
-                messageData.DateTimeAdded = message.Date;
-            }
-            else
-            {
-                messageData.UserId = message.ForwardFrom.Id;
-                messageData.UserFullName = GetUserFullName(message.ForwardFrom.FirstName, message.ForwardFrom.LastName);
-                messageData.UserName = message.ForwardFrom.Username;
-                messageData.DateTimeAdded = message.ForwardDate.Value;
-            }
-            if (IsInnerForward(message))
+
+            var messageData = forwardMsgData ?? msgData;
+            if (IsInnerForward(messageData.DateTimeAdded, messageData.UserId, messageData.ChatId))
             {
                 return new Core.Models.BayanResult();
             }
-            return Recognition.BayanDetector.DetectPhotoBayan(bitmap, messageData);
+
+            var result = Recognition.BayanDetector.DetectPhotoBayan(bitmap, messageData);
+            if (result.IsBayan)
+            {
+                // Наказываем баяниста
+                var statisticsRepository = new Core.Dal.StatisticsRepository();
+                // Сколько он уже набаянил
+                var bayans = statisticsRepository.IncrementBayansCount(msgData);
+                result.BayansCount = bayans;
+            }
+
+            return result;
         }
 
         [NonAction]
         public string GetPunishMessage()
-        {
+        {            
             string[] messages =
             {
                 "Где годнота?",
@@ -291,13 +322,13 @@ namespace AntiBayanBot.Web.Controllers
         }
 
         [NonAction]
-        public bool IsInnerForward(Telegram.Bot.Types.Message message)
+        public bool IsInnerForward(DateTime? forwardDate, long? forwardFrom, long chatId)
         {
-            if (message.ForwardDate == null)
+            if (forwardDate == null)
             {
                 return false;
             }
-            return new Core.Dal.ImageDataRepository().IsForwarded(message.ForwardDate.Value, message.ForwardFrom.Id, message.Chat.Id);
+            return new Core.Dal.ImageDataRepository().IsForwarded(forwardDate.Value, forwardFrom.Value, chatId);
         }
 
         [NonAction]
