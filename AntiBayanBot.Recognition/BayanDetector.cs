@@ -56,14 +56,7 @@ namespace AntiBayanBot.Recognition
                 {
                     // Cancell all tasks
                     cancellationTokenSource.Cancel();
-                    totalResult = taskResult;
-
-                    // Наказываем баяниста
-                    var statisticsRepository = new StatisticsRepository();
-
-                    // Сколько он уже набаянил
-                    var bayans = statisticsRepository.IncrementBayansCount(messageData);
-                    taskResult.BayansCount = bayans;
+                    totalResult = taskResult;                    
 
                     return totalResult;
                 }

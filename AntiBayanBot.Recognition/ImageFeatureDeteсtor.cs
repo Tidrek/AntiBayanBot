@@ -10,12 +10,12 @@ namespace AntiBayanBot.Recognition
 {
     public class ImageFeatureDeteсtor
     {
-        private readonly SURFDetector _surfDetector = new SURFDetector(300, false);
+        private readonly SURFDetector _surfDetector = new SURFDetector(300, false);        
         private readonly int _size = Settings.Get<int>("size");
 
 
         public float[,] GetDescriptors(Image image)
-        {
+        {            
             using (var grayImage = new Image<Gray, byte>(new Bitmap(image, _size, _size)))
             {
                 var modelKeyPoints = _surfDetector.DetectKeyPointsRaw(grayImage, null);
