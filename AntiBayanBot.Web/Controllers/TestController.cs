@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Web;
 using System.Web.Mvc;
-using AntiBayanBot.Recognition;
 
 namespace AntiBayanBot.Web.Controllers
 {
@@ -15,32 +14,24 @@ namespace AntiBayanBot.Web.Controllers
 
 
         [HttpPost]
-        public ActionResult Index(HttpPostedFileBase image1, HttpPostedFileBase image2)
+        public ActionResult Index(HttpPostedFileBase image)
         {
-            var detector = new ImageFeatureDeteсtor();
-
-            //var bmp1 = (Bitmap)Image.FromStream(image1.InputStream);
-            //var bmp2 = (Bitmap)Image.FromStream(image2.InputStream);
-
-            //var d1 = detector.GetDescriptors(bmp1);
-            //var d2 = detector.GetDescriptors(bmp2);
-
-            //return Content(detector.GetSimilarity(d1, d2).ToString(CultureInfo.InvariantCulture));
-
-            var image = Image.FromStream(image1.InputStream);
+            var img = Image.FromStream(image.InputStream);
             var messageData = new Core.Models.MessageData
             {
                 MessageId = 0,
                 ChatId = 0,
                 UserId = 0,
-                DateTimeAdded = DateTime.UtcNow,                
-                UserFullName = "foo bar",
-                UserName = "foobar"
+                DateTimeAdded = DateTime.UtcNow,
+                UserFullName = "Test",
+                UserName = "Test"
             };
-            var result = Recognition.BayanDetector.DetectPhotoBayan(image, messageData);
+            var result = Recognition.BayanDetector.DetectPhotoBayan(img, messageData);
 
-            return Content(result.IsBayan ? $"BAYAN. Bayanity is: {result.Bayanity}" : "OK");
+            return Content(
+                result.IsBayan ?
+                $"Баян. Уровень баянства: {result.Bayanity}." :
+                "Не баян.");
         }
-
     }
 }

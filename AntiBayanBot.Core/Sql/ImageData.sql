@@ -1,5 +1,5 @@
--- DROP TABLE IF EXISTS dbo.ImageData
-DROP TABLE dbo.ImageData
+ DROP TABLE IF EXISTS dbo.ImageData
+--DROP TABLE dbo.ImageData
 
 CREATE TABLE dbo.ImageData (
 	Id int IDENTITY(1,1) PRIMARY KEY NOT NULL,

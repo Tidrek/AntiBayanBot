@@ -3,28 +3,22 @@
 }
 
 <!DOCTYPE html>
-
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Test images</title>
+    <title>Тест</title>
 </head>
 <body>
 <div>
-    @using (Html.BeginForm("Index", "Test", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    @using (Html.BeginForm("Index", "Test", FormMethod.Post, new {enctype = "multipart/form-data"}))
     {
         <p>
-            <label for="image1">Upload image #1:</label>
-            <input type="file" name="image1" id="image1" />
+            <label for="image">Изображение:</label>
+            <input type="file" name="image" id="image"/>
         </p>
 
         <p>
-            <label for="image2">Upload image #2:</label>
-            <input type="file" name="image2" id="image2" />
-        </p>
-
-        <p>
-            <input type="submit" value="Upload" class="submit" />
+            <input type="submit" value="Загрузить" class="submit"/>
         </p>
     }
 </div>
