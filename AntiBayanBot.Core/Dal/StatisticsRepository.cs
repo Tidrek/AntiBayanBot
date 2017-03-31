@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Data.SqlTypes;
 using System.Text;
 using AntiBayanBot.Core.Models;
 
@@ -85,7 +87,7 @@ namespace AntiBayanBot.Core.Dal
             if (result == null)
                 return 0;
 
-            return (int) result;
+            return (int)result;
         }
 
         /// <summary>
@@ -100,8 +102,8 @@ namespace AntiBayanBot.Core.Dal
 
             var query =
                 bayans == 1 ?
-                "INSERT INTO dbo.[Statistics] (ChatId, UserId, UserName, UserFullName, Bayans) VALUES(@ChatId, @UserId, @UserName, @UserFullName, @Bayans)" :
-                "UPDATE dbo.[Statistics] SET Bayans = @Bayans WHERE ChatId = @ChatId AND UserId = @UserId";
+                    "INSERT INTO dbo.[Statistics] (ChatId, UserId, UserName, UserFullName, Bayans) VALUES(@ChatId, @UserId, @UserName, @UserFullName, @Bayans)" :
+                    "UPDATE dbo.[Statistics] SET Bayans = @Bayans WHERE ChatId = @ChatId AND UserId = @UserId";
 
             using (var connection = new SqlConnection(ConnectionString))
             using (var command = new SqlCommand(query, connection))
@@ -113,10 +115,14 @@ namespace AntiBayanBot.Core.Dal
                 if (bayans == 1)
                 {
                     command.Parameters.Add("@UserFullName", SqlDbType.NVarChar, 255).Value = messageData.UserFullName;
-                    if (!string.IsNullOrEmpty(messageData.UserName))
-                    {
-                        command.Parameters.Add("@UserName", SqlDbType.NVarChar, 32).Value = messageData.UserName;
-                    }
+
+                    var userNameParameter = new SqlParameter("@UserName", SqlDbType.NVarChar, 32);
+                    if (string.IsNullOrWhiteSpace(messageData.UserName))
+                        userNameParameter.Value = DBNull.Value;
+                    else
+                        userNameParameter.Value = messageData.UserName;
+
+                    command.Parameters.Add(userNameParameter);
                 }
 
                 connection.Open();
