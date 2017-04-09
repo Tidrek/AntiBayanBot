@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Collections.Generic;
 using System.Net;
 using System.Globalization;
+using AntiBayanBot.Core;
 
 namespace AntiBayanBot.Web.Controllers
 {
@@ -20,6 +21,12 @@ namespace AntiBayanBot.Web.Controllers
         public async Task<IHttpActionResult> Post(Update update)
         {
             var message = update.Message;
+            
+            Logger.Info($"New message.{Environment.NewLine}" +
+                        $"Chat ID: {message.Chat.Id}, chat title: {message.Chat.Title},{Environment.NewLine}" +
+                        $"User ID: {message.From.Id}, username: {message.From.Username}, user full name: {GetUserFullName(message.From.FirstName, message.From.LastName)}." +
+                        $"Message: {message.Text}");
+
             var result = new Core.Models.BayanResult();
             //For a case when single/multiple url-images w/ or w/o message text are in a single message. Contains only bayans
             var bayanResults = new List<Core.Models.BayanResult>();

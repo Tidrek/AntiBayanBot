@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiBayanBot.Tests", "AntiB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiBayanBot.Core", "AntiBayanBot.Core\AntiBayanBot.Core.csproj", "{88BA7A3A-1773-4D89-A5D1-2042A7A7769C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NgrokHosting", "NgrokHosting\NgrokHosting.csproj", "{F34F2FFE-300D-4795-91BA-9B06FE47D070}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,18 @@ Global
 		{88BA7A3A-1773-4D89-A5D1-2042A7A7769C}.Release|x64.Build.0 = Release|x64
 		{88BA7A3A-1773-4D89-A5D1-2042A7A7769C}.Release|x86.ActiveCfg = Release|x86
 		{88BA7A3A-1773-4D89-A5D1-2042A7A7769C}.Release|x86.Build.0 = Release|x86
+		{F34F2FFE-300D-4795-91BA-9B06FE47D070}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F34F2FFE-300D-4795-91BA-9B06FE47D070}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F34F2FFE-300D-4795-91BA-9B06FE47D070}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F34F2FFE-300D-4795-91BA-9B06FE47D070}.Debug|x64.Build.0 = Debug|Any CPU
+		{F34F2FFE-300D-4795-91BA-9B06FE47D070}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F34F2FFE-300D-4795-91BA-9B06FE47D070}.Debug|x86.Build.0 = Debug|Any CPU
+		{F34F2FFE-300D-4795-91BA-9B06FE47D070}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F34F2FFE-300D-4795-91BA-9B06FE47D070}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F34F2FFE-300D-4795-91BA-9B06FE47D070}.Release|x64.ActiveCfg = Release|Any CPU
+		{F34F2FFE-300D-4795-91BA-9B06FE47D070}.Release|x64.Build.0 = Release|Any CPU
+		{F34F2FFE-300D-4795-91BA-9B06FE47D070}.Release|x86.ActiveCfg = Release|Any CPU
+		{F34F2FFE-300D-4795-91BA-9B06FE47D070}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

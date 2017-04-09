@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Data.SqlTypes;
 using System.Text;
 using AntiBayanBot.Core.Models;
 
@@ -49,8 +48,8 @@ namespace AntiBayanBot.Core.Dal
                         result.Add(new Statistics
                         {
                             UserId = reader.GetInt64(0),
-                            UserName = reader.GetString(1),
-                            UserFullName = reader.GetString(2),
+                            UserName = reader.IsDBNull(1) ? null : reader.GetString(1),
+                            UserFullName =  reader.GetString(2),
                             Bayans = reader.GetInt32(3)
                         });
                     }
