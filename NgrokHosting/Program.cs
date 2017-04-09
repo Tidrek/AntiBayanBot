@@ -23,20 +23,41 @@ namespace NgrokHosting
 
         public static async Task Main()
         {
+            // Enable debug for ngrok?
+            bool debug;
+            while (true)
+            {
+                Console.Write("Inspect requests to ngrok (for debugging)? Type Y for inspect and N for no inspection. Default is N: ");
+                var key = Console.ReadKey();
+
+                Console.WriteLine();
+
+                if(key.Key == ConsoleKey.N || key.Key == ConsoleKey.Enter)
+                {
+                    debug = false;
+                    break;
+                }
+                if (key.Key == ConsoleKey.Y)
+                {
+                    debug = true;
+                    break;
+                }
+            }
+
             // Ngrok process
             var process = new Process
             {
                 StartInfo =
                 {
                     FileName = PathToNgrok,
-                    Arguments = "http 80",
+                    Arguments = debug ? "http 80" : "http -inspect=false 80",
                     WindowStyle = ProcessWindowStyle.Hidden
                 }
             };
 
             try
             {
-                Console.WriteLine("Starting ngrok.");
+                Console.WriteLine("Starting ngrok " + (debug ? "in inspect mode." : "without inspect mode."));
                 // Start Ngrok
                 process.Start();
                 Console.WriteLine("Ngrok started.");
@@ -49,20 +70,13 @@ namespace NgrokHosting
                 // Get page
                 var pageContent = await webClient.GetNgrokPanelPage();
 
+                // Parse URL from the page
                 var ngrokUrl = NgrokPanelPageParser.GetNgrokUrl(pageContent);
                 Console.WriteLine($"Ngrok URL: {ngrokUrl}");
 
+                // Update web hook
                 await webClient.UpdateWebHook(ngrokUrl);
                 Console.WriteLine("Web hook URL was updated successfully.");
-
-                while (true)
-                {
-                    Console.Write("Press any key to exit...");
-                    Console.ReadKey();
-                    process.Kill();
-                    process.WaitForExit();
-                    Environment.Exit(0);
-                }
             }
             catch (Exception e)
             {

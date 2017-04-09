@@ -24,7 +24,7 @@ namespace AntiBayanBot.Web.Controllers
             
             Logger.Info($"New message.{Environment.NewLine}" +
                         $"Chat ID: {message.Chat.Id}, chat title: {message.Chat.Title},{Environment.NewLine}" +
-                        $"User ID: {message.From.Id}, username: {message.From.Username}, user full name: {GetUserFullName(message.From.FirstName, message.From.LastName)}." +
+                        $"User ID: {message.From.Id}, username: {message.From.Username}, user full name: {GetUserFullName(message.From.FirstName, message.From.LastName)}." + Environment.NewLine +
                         $"Message: {message.Text}");
 
             var result = new Core.Models.BayanResult();
