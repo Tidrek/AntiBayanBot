@@ -142,6 +142,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\File.pubxml">
       <SubType>Designer</SubType>
     </None>
