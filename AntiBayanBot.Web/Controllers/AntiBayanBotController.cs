@@ -20,8 +20,14 @@ namespace AntiBayanBot.Web.Controllers
 
         public async Task<IHttpActionResult> Post(Update update)
         {
+            Hangfire.BackgroundJob.Enqueue(() => BackgroundProcessing(update));
+            return Ok();
+        }
+
+        public async void BackgroundProcessing(Update update)
+        {
             var message = update.Message;
-            
+
             Logger.Info($"New message.{Environment.NewLine}" +
                         $"Chat ID: {message.Chat.Id}, chat title: {message.Chat.Title},{Environment.NewLine}" +
                         $"User ID: {message.From.Id}, username: {message.From.Username}, user full name: {GetUserFullName(message.From.FirstName, message.From.LastName)}." + Environment.NewLine +
@@ -80,7 +86,7 @@ namespace AntiBayanBot.Web.Controllers
                                 }
                                 catch (Exception)
                                 {
-                                    return Ok();
+                                    return;// Ok();
                                 }
                             }
                         }
@@ -107,7 +113,7 @@ namespace AntiBayanBot.Web.Controllers
                     }
                     catch (Telegram.Bot.Exceptions.ApiRequestException ex) //Message was deleted before resolve could happen, hence, no punishment
                     {
-                        if (ex.Message == "Bad Request: message not found") { return Ok(); }
+                        if (ex.Message == "Bad Request: message not found") { return /*Ok()*/; }
                     }
                     try
                     {
@@ -137,8 +143,8 @@ namespace AntiBayanBot.Web.Controllers
             {   //LOG NAHUY
                 await _bot.SendTextMessageAsync(message.Chat.Id, text: "```" + ex.Message + "\n\n\n" + ex.StackTrace + "```", parseMode: ParseMode.Markdown);
             }
-            return Ok();
         }
+
 
         [NonAction]
         public AntiBayanBot.Core.Models.BayanResult GetBayanResult(Bitmap bitmap, Telegram.Bot.Types.Message message)
@@ -200,7 +206,7 @@ namespace AntiBayanBot.Web.Controllers
 
         [NonAction]
         public string GetPunishMessage()
-        {            
+        {
             string[] messages =
             {
                 "Где годнота?",

@@ -11,6 +11,8 @@ namespace AntiBayanBot.Web
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
+            Hangfire.JobStorage.Current = new Hangfire.SqlServer.SqlServerStorage("DefaultConnection");
+            var server = new Hangfire.BackgroundJobServer();
         }
     }
 }
