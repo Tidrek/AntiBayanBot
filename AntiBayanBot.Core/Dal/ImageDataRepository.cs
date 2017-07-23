@@ -23,7 +23,7 @@ namespace AntiBayanBot.Core.Dal
             using (var connection = new SqlConnection(ConnectionString))
             {
                 var command = new SqlCommand("SELECT MessageId, ChatId, UserId, Descriptors, DateTimeAdded, UserFullName, UserName FROM dbo.ImageData WHERE ChatId = @ChatId ORDER BY Id DESC", connection);
-
+                command.CommandTimeout = 0;
                 command.Parameters.Add("@ChatId", SqlDbType.BigInt).Value = chatId;
 
                 connection.Open();
@@ -89,6 +89,7 @@ namespace AntiBayanBot.Core.Dal
                                             WHERE DateTimeAdded=@dateForward
                                             AND UserId=@userIdForward
                                             AND ChatId=@chatId", connection);
+                command.CommandTimeout = 0;
 
                 command.Parameters.Add("@dateForward", SqlDbType.DateTime).Value = dateForward;
                 command.Parameters.Add("@userIdForward", SqlDbType.BigInt).Value = userIdForward;

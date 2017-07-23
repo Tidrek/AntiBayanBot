@@ -36,6 +36,7 @@ namespace AntiBayanBot.Core.Dal
             using (var connection = new SqlConnection(ConnectionString))
             {
                 var command = new SqlCommand(query.ToString(), connection);
+                command.CommandTimeout = 0;
                 command.Parameters.Add("@ChatId", SqlDbType.BigInt).Value = chatId;
 
                 connection.Open();
