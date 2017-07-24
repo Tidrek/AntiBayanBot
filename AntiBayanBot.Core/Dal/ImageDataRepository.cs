@@ -40,8 +40,6 @@ namespace AntiBayanBot.Core.Dal
                         UserFullName = reader.GetString(5),
                         UserName = reader.IsDBNull(6) ? null : reader.GetString(6)
                     });
-
-                    reader.NextResult();
                 }
             }
 
